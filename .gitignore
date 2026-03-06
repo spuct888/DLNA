@@ -27,3 +27,4 @@ app/build/outputs/apk/*/app-*.apk
 
 # Build output APKs
 bianyiapk/
+cling/
