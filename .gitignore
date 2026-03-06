@@ -1,0 +1,29 @@
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Android Studio / IntelliJ IDEA
+.idea/
+*.iml
+local.properties
+
+# Keystore
+*.jks
+*.keystore
+
+# Log files
+*.log
+
+# Local configuration
+local.properties
+
+# Mac OS
+.DS_Store
+
+# APK files (except for testing)
+app/*.apk
+app/build/outputs/apk/*/app-*.apk
+
+# Build output APKs
+bianyiapk/
