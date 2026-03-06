@@ -22,6 +22,7 @@ import java.io.InputStreamReader;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 import java.net.ServerSocket;
@@ -37,7 +38,7 @@ public class DlnaService extends Service {
     private static final String TAG = "DlnaService";
     private static final String CHANNEL_ID = "dlna_service_channel";
     private static final int NOTIFICATION_ID = 1;
-    private static final int HTTP_PORT = 8080;
+    private static final int HTTP_PORT = 8081;
 
     private WifiManager.MulticastLock multicastLock;
     private Handler handler = new Handler(Looper.getMainLooper());
@@ -210,16 +211,23 @@ public class DlnaService extends Service {
     private void startHttpServer() {
         executorService.execute(() -> {
             try {
-                httpServerSocket = new ServerSocket(HTTP_PORT);
-                httpServerSocket.setSoTimeout(5000);
-                Log.d(TAG, "HTTP服务器已启动，端口: " + HTTP_PORT);
+                httpServerSocket = new ServerSocket();
+                httpServerSocket.setReuseAddress(true);
+                httpServerSocket.bind(new InetSocketAddress(InetAddress.getByName(localIpAddress), HTTP_PORT));
+                httpServerSocket.setSoTimeout(30000);
+                Log.d(TAG, "HTTP服务器已启动，端口: " + HTTP_PORT + ", 绑定地址: " + localIpAddress);
                 
                 while (isServiceStarted) {
                     try {
                         Socket clientSocket = httpServerSocket.accept();
                         handleHttpRequest(clientSocket);
+                    } catch (SocketTimeoutException e) {
+                        if (isServiceStarted) {
+                            Log.d(TAG, "等待客户端连接超时，继续监听...");
+                        }
                     } catch (IOException e) {
                         if (isServiceStarted) {
+                            Log.e(TAG, "接受客户端连接失败: " + e.getMessage());
                         }
                     }
                 }
@@ -617,7 +625,7 @@ public class DlnaService extends Service {
                         
                         String notifyMessage = "NOTIFY * HTTP/1.1\r\n" +
                                 "Host: 239.255.255.250:1900\r\n" +
-                                "Location: http://" + localIpAddress + ":8080/device.xml\r\n" +
+                                "Location: http://" + localIpAddress + ":" + HTTP_PORT + "/device.xml\r\n" +
                                 "NT: " + nt + "\r\n" +
                                 "NTS: ssdp:alive\r\n" +
                                 "USN: " + usn + "\r\n" +
@@ -750,7 +758,7 @@ public class DlnaService extends Service {
                     "CACHE-CONTROL: max-age=1800\r\n" +
                     "DATE: " + new java.util.Date().toString() + "\r\n" +
                     "EXT:\r\n" +
-                    "LOCATION: http://" + localIpAddress + ":8080/device.xml\r\n" +
+                    "LOCATION: http://" + localIpAddress + ":" + HTTP_PORT + "/device.xml\r\n" +
                     "SERVER: Android/7.0, UPnP/1.0, DLNA/1.50\r\n" +
                     "ST: " + st + "\r\n" +
                     "USN: " + usn + "\r\n" +
@@ -772,10 +780,26 @@ public class DlnaService extends Service {
     }
 
     private String getLocalIpAddress() {
-        // 直接返回电视的实际IP地址
-        String tvIp = "192.168.9.101";
-        Log.d(TAG, "使用电视的实际IP地址: " + tvIp);
-        return tvIp;
+        try {
+            List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
+            for (NetworkInterface intf : interfaces) {
+                if (intf.getName().equals("eth0") || intf.getName().equals("wlan0")) {
+                    Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses();
+                    while (enumIpAddr.hasMoreElements()) {
+                        InetAddress inetAddress = enumIpAddr.nextElement();
+                        if (!inetAddress.isLoopbackAddress() && inetAddress instanceof java.net.Inet4Address) {
+                            String ip = inetAddress.getHostAddress();
+                            Log.d(TAG, "获取到设备IP地址: " + ip + ", 接口: " + intf.getName());
+                            return ip;
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "获取IP地址失败: " + e.getMessage());
+        }
+        Log.w(TAG, "无法获取IP地址，使用默认值");
+        return "192.168.10.186";
     }
 
     public void play(String uri, String title) {
