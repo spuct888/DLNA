@@ -79,8 +79,6 @@ public class PlayerActivity extends AppCompatActivity {
                         btnPlayPause.setImageResource(playWhenReady ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play);
                         seekBar.setMax((int) player.getDuration());
                         updateTimeDisplay();
-<<<<<<< HEAD
-=======
                     } else if (playbackState == SimpleExoPlayer.STATE_ENDED) {
                         // 播放结束，通知DlnaService
                         btnPlayPause.setImageResource(android.R.drawable.ic_media_play);
@@ -88,7 +86,6 @@ public class PlayerActivity extends AppCompatActivity {
                         if (dlnaService != null) {
                             dlnaService.stop();
                         }
->>>>>>> e3bddb0 (修复视频进度同步问题，添加GetPositionInfo支持)
                     }
                 }
 
@@ -161,13 +158,6 @@ public class PlayerActivity extends AppCompatActivity {
             // 启动定时更新进度条和时间显示
             new Thread(() -> {
                 while (true) {
-<<<<<<< HEAD
-                    if (player != null && player.getPlayWhenReady()) {
-                        runOnUiThread(() -> {
-                            if (player != null) {
-                                seekBar.setProgress((int) player.getCurrentPosition());
-                                updateTimeDisplay();
-=======
                     if (player != null) {
                         runOnUiThread(() -> {
                             if (player != null) {
@@ -185,7 +175,6 @@ public class PlayerActivity extends AppCompatActivity {
                                 } else if (duration <= 0) {
                                     Log.d("PlayerActivity", "Invalid duration: " + duration);
                                 }
->>>>>>> e3bddb0 (修复视频进度同步问题，添加GetPositionInfo支持)
                             }
                         });
                     }

@@ -1,22 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-<<<<<<< HEAD
-    compileSdkVersion 26
-    buildToolsVersion '28.0.3'
-=======
     compileSdkVersion 28
     buildToolsVersion '35.0.0'
->>>>>>> e3bddb0 (修复视频进度同步问题，添加GetPositionInfo支持)
 
     defaultConfig {
         applicationId "com.dlna.receiver"
         minSdkVersion 19
-<<<<<<< HEAD
-        targetSdkVersion 26
-=======
         targetSdkVersion 28
->>>>>>> e3bddb0 (修复视频进度同步问题，添加GetPositionInfo支持)
         versionCode 1
         versionName "1.0"
 

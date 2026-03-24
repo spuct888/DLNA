@@ -350,12 +350,9 @@ public class DlnaService extends Service {
                     } else if (soapAction.contains("gettransportinfo")) {
                         Log.d(TAG, "处理GetTransportInfo操作");
                         response = getTransportInfoResponseXml();
-<<<<<<< HEAD
-=======
                     } else if (soapAction.contains("getpositioninfo")) {
                         Log.d(TAG, "处理GetPositionInfo操作");
                         response = getPositionInfoResponseXml();
->>>>>>> e3bddb0 (修复视频进度同步问题，添加GetPositionInfo支持)
                     } else {
                         Log.d(TAG, "未知的SOAP操作: " + soapAction);
                         response = getAVTransportControlXml();
@@ -470,8 +467,6 @@ public class DlnaService extends Service {
                 "<argument><name>InstanceID</name><direction>in</direction><relatedStateVariable>A_ARG_TYPE_InstanceID</relatedStateVariable></argument>" +
                 "<argument><name>CurrentTransportState</name><direction>out</direction><relatedStateVariable>TransportState</relatedStateVariable></argument>" +
                 "</argumentList></action>" +
-<<<<<<< HEAD
-=======
                 "<action><name>GetPositionInfo</name>" +
                 "<argumentList>" +
                 "<argument><name>InstanceID</name><direction>in</direction><relatedStateVariable>A_ARG_TYPE_InstanceID</relatedStateVariable></argument>" +
@@ -482,7 +477,6 @@ public class DlnaService extends Service {
                 "<argument><name>RelCount</name><direction>out</direction><relatedStateVariable>A_ARG_TYPE_RelCount</relatedStateVariable></argument>" +
                 "<argument><name>AbsCount</name><direction>out</direction><relatedStateVariable>A_ARG_TYPE_AbsCount</relatedStateVariable></argument>" +
                 "</argumentList></action>" +
->>>>>>> e3bddb0 (修复视频进度同步问题，添加GetPositionInfo支持)
                 "</actionList>" +
                 "<serviceStateTable>" +
                 "<stateVariable><name>TransportState</name><dataType>string</dataType></stateVariable>" +
@@ -491,15 +485,12 @@ public class DlnaService extends Service {
                 "<stateVariable><name>A_ARG_TYPE_InstanceID</name><dataType>ui4</dataType></stateVariable>" +
                 "<stateVariable><name>A_ARG_TYPE_SeekMode</name><dataType>string</dataType></stateVariable>" +
                 "<stateVariable><name>A_ARG_TYPE_SeekTarget</name><dataType>string</dataType></stateVariable>" +
-<<<<<<< HEAD
-=======
                 "<stateVariable><name>A_ARG_TYPE_Track</name><dataType>ui4</dataType></stateVariable>" +
                 "<stateVariable><name>A_ARG_TYPE_Duration</name><dataType>string</dataType></stateVariable>" +
                 "<stateVariable><name>A_ARG_TYPE_RelTime</name><dataType>string</dataType></stateVariable>" +
                 "<stateVariable><name>A_ARG_TYPE_AbsTime</name><dataType>string</dataType></stateVariable>" +
                 "<stateVariable><name>A_ARG_TYPE_RelCount</name><dataType>ui4</dataType></stateVariable>" +
                 "<stateVariable><name>A_ARG_TYPE_AbsCount</name><dataType>ui4</dataType></stateVariable>" +
->>>>>>> e3bddb0 (修复视频进度同步问题，添加GetPositionInfo支持)
                 "</serviceStateTable>" +
                 "</scpd>";
     }
@@ -614,8 +605,6 @@ public class DlnaService extends Service {
                 "</s:Envelope>";
     }
 
-<<<<<<< HEAD
-=======
     private String getPositionInfoResponseXml() {
         String trackDuration = formatTime(duration);
         String relTime = formatTime(currentPosition);
@@ -636,7 +625,7 @@ public class DlnaService extends Service {
                 "</s:Envelope>";
     }
 
->>>>>>> e3bddb0 (修复视频进度同步问题，添加GetPositionInfo支持)
+
     private String getConnectionManagerControlXml() {
         return "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
                 "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">" +
@@ -885,24 +874,18 @@ public class DlnaService extends Service {
     public void seek(long position) {
         Log.d(TAG, " seek to: " + position);
         currentPosition = position;
-<<<<<<< HEAD
-        
-=======
->>>>>>> e3bddb0 (修复视频进度同步问题，添加GetPositionInfo支持)
         if (eventListener != null) {
             eventListener.onSeek(position);
         }
     }
 
-<<<<<<< HEAD
-=======
     public void updatePosition(long position, long totalDuration) {
         Log.d(TAG, "Received position update: " + position + ", duration: " + totalDuration);
         currentPosition = position;
         duration = totalDuration;
     }
 
->>>>>>> e3bddb0 (修复视频进度同步问题，添加GetPositionInfo支持)
+
     public void setVolume(int volume) {
         Log.d(TAG, "设置音量: " + volume);
         this.volume = volume;

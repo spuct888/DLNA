@@ -17,6 +17,7 @@ import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
@@ -83,12 +84,9 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity imple
             
             // 启动服务状态检查
             startServiceStatusCheck();
-<<<<<<< HEAD
-=======
             
             // 启动定时更新播放位置到DlnaService
             startPositionUpdate();
->>>>>>> e3bddb0 (修复视频进度同步问题，添加GetPositionInfo支持)
         } catch (Exception e) {
             Log.e(TAG, "初始化失败: " + e.getMessage());
             e.printStackTrace();
@@ -205,8 +203,6 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity imple
         };
         statusHandler.post(statusCheckRunnable);
     }
-<<<<<<< HEAD
-=======
     
     private void startPositionUpdate() {
         new Thread(() -> {
@@ -237,7 +233,6 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity imple
             }
         }).start();
     }
->>>>>>> e3bddb0 (修复视频进度同步问题，添加GetPositionInfo支持)
 
     private void checkServiceStatus() {
         try {
@@ -381,6 +376,8 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity imple
                     
                     // 解码HTML实体（如 &amp; -> &）
                     String decodedUri = android.text.Html.fromHtml(uri).toString();
+                    // 进一步处理URL，确保格式正确
+                    decodedUri = decodedUri.replace("&amp;", "&");
                     Log.d(TAG, "解码后的URI: " + decodedUri);
                     
                     // 使用ExoPlayer播放视频
@@ -390,17 +387,33 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity imple
                     // 创建带有User-Agent的DataSource
                     String userAgent = "Mozilla/5.0 (Linux; Android 8.0.0; TV) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36";
                     DefaultHttpDataSourceFactory httpDataSourceFactory = new DefaultHttpDataSourceFactory(userAgent, null, 
-                        30000, 30000, true);
+                        60000, 60000, true);
                     
                     // 添加额外的HTTP Headers
                     httpDataSourceFactory.setDefaultRequestProperty("Accept", "*/*");
                     httpDataSourceFactory.setDefaultRequestProperty("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8");
                     httpDataSourceFactory.setDefaultRequestProperty("Connection", "keep-alive");
+                    httpDataSourceFactory.setDefaultRequestProperty("Cache-Control", "no-cache");
+                    httpDataSourceFactory.setDefaultRequestProperty("Pragma", "no-cache");
+                    httpDataSourceFactory.setDefaultRequestProperty("Origin", "https://www.cctv.com");
+                    httpDataSourceFactory.setDefaultRequestProperty("Referer", "https://www.cctv.com/");
                     
                     DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this, null, httpDataSourceFactory);
                     
-                    MediaSource videoSource = new ExtractorMediaSource.Factory(dataSourceFactory)
-                        .createMediaSource(Uri.parse(decodedUri));
+                    // 根据URL类型创建不同的MediaSource
+                    Uri videoUri = Uri.parse(decodedUri);
+                    MediaSource videoSource;
+                    
+                    // 检查是否是直播流或HLS流
+                    if (decodedUri.contains(".m3u8") || decodedUri.contains("hls") || decodedUri.contains("live")) {
+                        Log.d(TAG, "检测到直播流或HLS流，使用HlsMediaSource");
+                        videoSource = new HlsMediaSource.Factory(dataSourceFactory)
+                            .createMediaSource(videoUri);
+                    } else {
+                        Log.d(TAG, "使用ExtractorMediaSource");
+                        videoSource = new ExtractorMediaSource.Factory(dataSourceFactory)
+                            .createMediaSource(videoUri);
+                    }
                     
                     Log.d(TAG, "准备加载视频，URI: " + decodedUri);
                     
