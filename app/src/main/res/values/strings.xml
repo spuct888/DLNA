@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">DLNA接收器</string>
+    <string name="waiting_for_cast">等待投屏...</string>
+    <string name="device_name">设备名称: %s</string>
+    <string name="connected">已连接</string>
+    <string name="disconnected">未连接</string>
+    <string name="playing">正在播放</string>
+    <string name="paused">已暂停</string>
+</resources>
