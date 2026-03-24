@@ -395,8 +395,11 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity imple
                     httpDataSourceFactory.setDefaultRequestProperty("Connection", "keep-alive");
                     httpDataSourceFactory.setDefaultRequestProperty("Cache-Control", "no-cache");
                     httpDataSourceFactory.setDefaultRequestProperty("Pragma", "no-cache");
-                    httpDataSourceFactory.setDefaultRequestProperty("Origin", "https://www.cctv.com");
-                    httpDataSourceFactory.setDefaultRequestProperty("Referer", "https://www.cctv.com/");
+                    httpDataSourceFactory.setDefaultRequestProperty("Origin", "https://www.douyin.com");
+                    httpDataSourceFactory.setDefaultRequestProperty("Referer", "https://www.douyin.com/");
+                    httpDataSourceFactory.setDefaultRequestProperty("Sec-Fetch-Dest", "video");
+                    httpDataSourceFactory.setDefaultRequestProperty("Sec-Fetch-Mode", "no-cors");
+                    httpDataSourceFactory.setDefaultRequestProperty("Sec-Fetch-Site", "cross-site");
                     
                     DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this, null, httpDataSourceFactory);
                     
