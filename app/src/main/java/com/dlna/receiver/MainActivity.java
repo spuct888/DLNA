@@ -560,8 +560,41 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity imple
         } else if (keyCode == android.view.KeyEvent.KEYCODE_DPAD_DOWN) {
             scaleVideo(false); // 缩小
             return true;
+        } else if (keyCode == android.view.KeyEvent.KEYCODE_DPAD_RIGHT) {
+            fastForward(); // 快进
+            return true;
+        } else if (keyCode == android.view.KeyEvent.KEYCODE_DPAD_LEFT) {
+            rewind(); // 快退
+            return true;
         }
         return super.onKeyDown(keyCode, event);
+    }
+    
+    private void fastForward() {
+        if (player != null) {
+            long currentPosition = player.getCurrentPosition();
+            long newPosition = currentPosition + 10000; // 快进10秒
+            long duration = player.getDuration();
+            if (duration > 0 && newPosition < duration) {
+                player.seekTo(newPosition);
+                Toast.makeText(this, "快进10秒", Toast.LENGTH_SHORT).show();
+            } else if (duration > 0) {
+                player.seekTo(duration - 1000);
+                Toast.makeText(this, "已到视频末尾", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+    
+    private void rewind() {
+        if (player != null) {
+            long currentPosition = player.getCurrentPosition();
+            long newPosition = currentPosition - 10000; // 快退10秒
+            if (newPosition < 0) {
+                newPosition = 0;
+            }
+            player.seekTo(newPosition);
+            Toast.makeText(this, "快退10秒", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void rotateVideo() {
