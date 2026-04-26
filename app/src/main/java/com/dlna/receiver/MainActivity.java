@@ -566,6 +566,9 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity imple
         } else if (keyCode == android.view.KeyEvent.KEYCODE_DPAD_LEFT) {
             rewind(); // 快退
             return true;
+        } else if (keyCode == android.view.KeyEvent.KEYCODE_DPAD_CENTER || keyCode == android.view.KeyEvent.KEYCODE_ENTER) {
+            togglePausePlay(); // 暂停/播放切换
+            return true;
         }
         return super.onKeyDown(keyCode, event);
     }
@@ -594,6 +597,29 @@ public class MainActivity extends android.support.v7.app.AppCompatActivity imple
             }
             player.seekTo(newPosition);
             Toast.makeText(this, "快退10秒", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void togglePausePlay() {
+        if (player != null && player.getPlaybackState() == com.google.android.exoplayer2.Player.STATE_READY) {
+            boolean isPlaying = player.getPlayWhenReady();
+            player.setPlayWhenReady(!isPlaying);
+            if (!isPlaying) {
+                // 当前是暂停状态，设置为播放
+                if (tvStatus != null) {
+                    tvStatus.setText("正在播放");
+                    tvStatus.setTextColor(getResources().getColor(android.R.color.holo_green_light));
+                }
+                Toast.makeText(this, "继续播放", Toast.LENGTH_SHORT).show();
+            } else {
+                // 当前是播放状态，设置为暂停
+                if (tvStatus != null) {
+                    tvStatus.setText("已暂停");
+                    tvStatus.setTextColor(getResources().getColor(android.R.color.holo_orange_light));
+                }
+                Toast.makeText(this, "已暂停", Toast.LENGTH_SHORT).show();
+            }
+            Log.d(TAG, "暂停/播放切换，当前状态: " + (!isPlaying ? "播放" : "暂停"));
         }
     }
 
