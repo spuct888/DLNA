@@ -21,6 +21,9 @@ local.properties
 # Mac OS
 .DS_Store
 
+# IDE workspace cache
+.workbuddy/
+
 # APK files (except for testing)
 app/*.apk
 app/build/outputs/apk/*/app-*.apk
