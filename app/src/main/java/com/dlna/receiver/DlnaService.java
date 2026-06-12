@@ -353,6 +353,32 @@ public class DlnaService extends Service {
                     } else if (soapAction.contains("getpositioninfo")) {
                         Log.d(TAG, "处理GetPositionInfo操作");
                         response = getPositionInfoResponseXml();
+                    } else if (soapAction.contains("seek")) {
+                        Log.d(TAG, "处理Seek操作");
+                        // 从请求体中提取Seek目标位置
+                        if (requestBody.contains("<Unit>") && requestBody.contains("<Target>")) {
+                            int unitStart = requestBody.indexOf("<Unit>") + 6;
+                            int unitEnd = requestBody.indexOf("</Unit>");
+                            int targetStart = requestBody.indexOf("<Target>") + 8;
+                            int targetEnd = requestBody.indexOf("</Target>");
+                            
+                            if (unitStart > 0 && unitEnd > unitStart && targetStart > 0 && targetEnd > targetStart) {
+                                String unit = requestBody.substring(unitStart, unitEnd).trim();
+                                String target = requestBody.substring(targetStart, targetEnd).trim();
+                                Log.d(TAG, "Seek Unit: " + unit + ", Target: " + target);
+                                
+                                // 解析时间格式 (格式: HH:MM:SS)
+                                long position = parseTime(target);
+                                Log.d(TAG, "解析后的Seek位置: " + position + "ms");
+                                
+                                // 更新当前位置并触发seek事件
+                                currentPosition = position;
+                                if (eventListener != null) {
+                                    eventListener.onSeek(position);
+                                }
+                            }
+                        }
+                        response = getSeekResponseXml();
                     } else {
                         Log.d(TAG, "未知的SOAP操作: " + soapAction);
                         response = getAVTransportControlXml();
@@ -577,6 +603,15 @@ public class DlnaService extends Service {
                 "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">" +
                 "<s:Body>" +
                 "<u:PauseResponse xmlns:u=\"urn:schemas-upnp-org:service:AVTransport:1\"/>" +
+                "</s:Body>" +
+                "</s:Envelope>";
+    }
+
+    private String getSeekResponseXml() {
+        return "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
+                "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">" +
+                "<s:Body>" +
+                "<u:SeekResponse xmlns:u=\"urn:schemas-upnp-org:service:AVTransport:1\"/>" +
                 "</s:Body>" +
                 "</s:Envelope>";
     }
